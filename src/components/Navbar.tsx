@@ -20,6 +20,18 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetId = href.replace("#", "");
+    const elem = document.getElementById(targetId);
+    if (elem) {
+      const yOffset = -80; // offset to account for fixed header
+      const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+    setOpen(false);
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
@@ -27,7 +39,11 @@ export function Navbar() {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-12">
-        <a href="#home" className="group flex flex-col leading-none">
+        <a 
+          href="#home" 
+          onClick={(e) => handleScroll(e, "#home")}
+          className="group flex flex-col leading-none"
+        >
           <span className="font-display text-xl md:text-2xl text-white tracking-wide">
             Shiv <span className="text-gradient-gold">Rudraksh</span>
           </span>
@@ -41,6 +57,7 @@ export function Navbar() {
             <a
               key={l.href}
               href={l.href}
+              onClick={(e) => handleScroll(e, l.href)}
               className="relative text-[0.78rem] uppercase tracking-[0.22em] text-white/80 hover:text-white transition-colors after:content-[''] after:absolute after:left-0 after:-bottom-2 after:h-px after:w-0 after:bg-gold after:transition-all after:duration-500 hover:after:w-full"
             >
               {l.label}
@@ -50,6 +67,7 @@ export function Navbar() {
 
         <a
           href="#contact"
+          onClick={(e) => handleScroll(e, "#contact")}
           className="hidden lg:inline-flex items-center px-6 py-3 text-[0.72rem] uppercase tracking-[0.25em] font-medium bg-gold text-charcoal hover:bg-transparent hover:text-gold border border-gold transition-all duration-500"
         >
           Book Now
@@ -71,7 +89,7 @@ export function Navbar() {
               <a
                 key={l.href}
                 href={l.href}
-                onClick={() => setOpen(false)}
+                onClick={(e) => handleScroll(e, l.href)}
                 className="py-3 text-sm uppercase tracking-[0.2em] text-white/85"
               >
                 {l.label}
@@ -79,7 +97,7 @@ export function Navbar() {
             ))}
             <a
               href="#contact"
-              onClick={() => setOpen(false)}
+              onClick={(e) => handleScroll(e, "#contact")}
               className="mt-3 inline-flex justify-center px-6 py-3 text-xs uppercase tracking-[0.25em] bg-gold text-charcoal"
             >
               Book Now

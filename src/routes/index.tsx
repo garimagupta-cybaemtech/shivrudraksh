@@ -213,6 +213,14 @@ const testimonials = [
 
 function LuxuryCarousel3D({ items }: { items: any[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const next = () => setActiveIndex((curr) => (curr + 1) % items.length);
   const prev = () => setActiveIndex((curr) => (curr - 1 + items.length) % items.length);
@@ -235,10 +243,10 @@ function LuxuryCarousel3D({ items }: { items: any[] }) {
         const isActive = diff === 0;
         
         let zIndex = 10 - Math.abs(diff);
-        let scale = isActive ? 1 : 0.8;
-        let translateX = diff * 45; // percentage offset
+        let scale = isActive ? 1 : (isMobile ? 0.72 : 0.8);
+        let translateX = diff * (isMobile ? 32 : 45); // percentage offset
         let opacity = Math.abs(diff) <= 2 ? 1 - Math.abs(diff) * 0.3 : 0;
-        let rotateY = diff * -25; // angle towards center
+        let rotateY = diff * (isMobile ? -15 : -25); // angle towards center
         let blur = isActive ? "0px" : "6px";
 
         if (Math.abs(diff) > 2) return null;
@@ -279,6 +287,17 @@ function LuxuryCarousel3D({ items }: { items: any[] }) {
 }
 
 function Index() {
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetId = href.replace("#", "");
+    const elem = document.getElementById(targetId);
+    if (elem) {
+      const yOffset = -80; // offset to account for fixed header
+      const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
+
   return (
     <main className="bg-background text-foreground">
       <Navbar />
@@ -313,8 +332,8 @@ function Index() {
           </Reveal>
           <Reveal delay={600}>
             <div className="mt-12 flex flex-col sm:flex-row gap-4 items-center justify-center">
-              <a href="#contact" className="luxe-btn">Reserve Your Stay</a>
-              <a href="#rooms" className="luxe-btn-ghost">Explore Suites</a>
+              <a href="#contact" onClick={(e) => handleScroll(e, "#contact")} className="luxe-btn">Reserve Your Stay</a>
+              <a href="#rooms" onClick={(e) => handleScroll(e, "#rooms")} className="luxe-btn-ghost">Explore Suites</a>
             </div>
           </Reveal>
         </div>
@@ -433,7 +452,7 @@ function Index() {
             </div>
 
             <Reveal delay={700}>
-              <a href="#rooms" className="luxe-btn mt-12">Discover Suites</a>
+              <a href="#rooms" onClick={(e) => handleScroll(e, "#rooms")} className="luxe-btn mt-12">Discover Suites</a>
             </Reveal>
           </div>
         </div>
@@ -506,6 +525,7 @@ function Index() {
                     <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{r.desc}</p>
                     <a
                       href="#contact"
+                      onClick={(e) => handleScroll(e, "#contact")}
                       className="mt-6 inline-flex items-center gap-2 text-[0.72rem] tracking-[0.25em] uppercase text-foreground border-b border-gold pb-1 hover:gap-3 transition-all"
                     >
                       Reserve Suite <ArrowUpRight size={14} />
@@ -609,7 +629,7 @@ function Index() {
               </div>
 
               <Reveal delay={600}>
-                <a href="#contact" className="luxe-btn mt-10 shadow-[0_0_20px_rgba(212,175,55,0.15)] hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]">Plan Your Event</a>
+                <a href="#contact" onClick={(e) => handleScroll(e, "#contact")} className="luxe-btn mt-10 shadow-[0_0_20px_rgba(212,175,55,0.15)] hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]">Plan Your Event</a>
               </Reveal>
             </div>
             
@@ -668,7 +688,7 @@ function Index() {
 
           <div className="text-center mt-16">
             <Reveal>
-              <a href="#contact" className="luxe-btn">Discover Experiences</a>
+              <a href="#contact" onClick={(e) => handleScroll(e, "#contact")} className="luxe-btn">Discover Experiences</a>
             </Reveal>
           </div>
         </div>
@@ -693,7 +713,7 @@ function Index() {
 
           <div className="text-center mt-16">
             <Reveal>
-              <a href="#contact" className="luxe-btn-ghost !text-foreground !border-gold/60">
+              <a href="#contact" onClick={(e) => handleScroll(e, "#contact")} className="luxe-btn-ghost !text-foreground !border-gold/60">
                 View Resort Moments
               </a>
             </Reveal>
