@@ -145,62 +145,56 @@
     transform: translateY(0);
   }
   .luxe-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .5rem;
-    padding: 0.95rem 1.8rem;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    background: var(--gold);
-    color: var(--charcoal);
-    border: 1px solid var(--gold);
-    transition: all .4s ease;
+    display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
+    padding: 1.1rem 2.2rem; font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+    color: var(--charcoal); border: 1px solid var(--gold);
+    transition: all .5s cubic-bezier(.2,.7,.2,1);
+    position: relative; overflow: hidden;
+  }
+  .luxe-btn::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 30%, color-mix(in oklab, white 55%, transparent) 50%, transparent 70%);
+    transform: translateX(-120%); transition: transform .9s ease;
   }
   .luxe-btn:hover {
-    background: transparent;
-    color: var(--gold-soft);
-    box-shadow: var(--shadow-gold);
+    box-shadow: 0 0 0 1px var(--gold), 0 20px 60px -15px color-mix(in oklab, var(--gold) 55%, transparent);
+    transform: translateY(-2px);
   }
+  .luxe-btn:hover::after { transform: translateX(120%); }
   .luxe-btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .5rem;
-    padding: 0.95rem 1.8rem;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    background: transparent;
-    color: white;
-    border: 1px solid color-mix(in oklab, white 50%, transparent);
-    transition: all .4s ease;
+    display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
+    padding: 1.1rem 2.2rem; font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    background: transparent; color: white;
+    border: 1px solid color-mix(in oklab, var(--gold) 70%, transparent);
+    transition: all .5s ease;
   }
   .luxe-btn-ghost:hover {
-    background: white;
-    color: var(--charcoal);
+    background: color-mix(in oklab, var(--gold) 12%, transparent);
+    color: var(--gold-soft); box-shadow: var(--shadow-gold);
+    transform: translateY(-2px);
   }
   .eyebrow {
-    font-family: var(--font-sans);
-    font-size: 0.72rem;
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 500;
+    font-family: var(--font-sans); font-size: 0.72rem;
+    letter-spacing: 0.4em; text-transform: uppercase;
+    color: var(--gold); font-weight: 500;
   }
   .float-slow { animation: floatSlow 7s ease-in-out infinite; }
+  .pulse-whats { animation: pulseWhats 2.4s ease-in-out infinite; }
 }
 
 @keyframes floatSlow {
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
-
+@keyframes pulseWhats {
+  0%,100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, .55); }
+  50% { box-shadow: 0 0 0 16px rgba(37, 211, 102, 0); }
+}
 @keyframes kenburns {
   0% { transform: scale(1.08) translate3d(0,0,0); }
-  100% { transform: scale(1.18) translate3d(-1%, -1%, 0); }
+  100% { transform: scale(1.22) translate3d(-1.5%, -1.5%, 0); }
 }
-.kenburns { animation: kenburns 18s ease-in-out infinite alternate; }
+.kenburns { animation: kenburns 22s ease-in-out infinite alternate; }
