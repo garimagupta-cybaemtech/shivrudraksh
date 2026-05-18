@@ -1,0 +1,4 @@
+file 'hero_ganga_aerial.mp4'
+file 'hero_lobby_entrance.mp4'
+file 'hero_luxury_suite.mp4'
+file 'hero_aerial_pullback.mp4'

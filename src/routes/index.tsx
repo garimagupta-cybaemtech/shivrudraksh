@@ -1,5 +1,5 @@
+import React, { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef, useState, useEffect, useCallback } from "react";
 import {
   BedDouble,
   Waves,
@@ -16,6 +16,8 @@ import {
   Twitter,
   ArrowUpRight,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ShieldCheck,
   Headphones,
   Award,
@@ -42,91 +44,28 @@ import g4 from "@/assets/gallery-4.jpg";
 import g5 from "@/assets/gallery-5.jpg";
 import g6 from "@/assets/gallery-6.jpg";
 import ctaNight from "@/assets/cta-night.jpg";
-
-const HERO_CLIPS = [
-  "/videos/hero_ganga_aerial.mp4",
-  "/videos/hero_lobby_entrance.mp4",
-  "/videos/hero_luxury_suite.mp4",
-  "/videos/hero_aerial_pullback.mp4",
-];
-
-const CROSSFADE_MS = 1200;
+import eventWedding from "@/assets/events/wedding.png";
+import eventConference from "@/assets/events/conference.png";
+import eventRooftop from "@/assets/events/rooftop.png";
+import diningBreakfast from "@/assets/dining/breakfast.png";
+import diningHall from "@/assets/dining/hall.png";
+import diningRooftop from "@/assets/dining/rooftop.png";
+import diningDish from "@/assets/dining/dish.png";
 
 function CinematicHeroVideo({ poster }: { poster: string }) {
-  // a = current visible buffer index (0 or 1)
-  // b = incoming buffer index during crossfade (null when not fading)
-  const [a, setA] = useState(0);
-  const [b, setB] = useState<number | null>(null);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([null, null]);
-  const clipIdxRef = useRef(0);
-  const activeRef = useRef(0);
-  const fadingRef = useRef(false);
-
-  const advanceClip = useCallback(() => {
-    if (fadingRef.current) return;
-    fadingRef.current = true;
-    const nextClip = (clipIdxRef.current + 1) % HERO_CLIPS.length;
-    const nextBuf = (activeRef.current + 1) % 2;
-    const nextVid = videoRefs.current[nextBuf];
-    if (!nextVid) return;
-    nextVid.src = HERO_CLIPS[nextClip];
-    nextVid.load();
-    nextVid.play().catch(() => {});
-    // show the incoming buffer (it fades in via CSS transition)
-    setB(nextBuf);
-    setTimeout(() => {
-      clipIdxRef.current = nextClip;
-      activeRef.current = nextBuf;
-      fadingRef.current = false;
-      setA(nextBuf);
-      setB(null);
-    }, CROSSFADE_MS);
-  }, []);
-
-  useEffect(() => {
-    const vid = videoRefs.current[0];
-    if (!vid) return;
-    vid.src = HERO_CLIPS[0];
-    vid.load();
-    vid.play().catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    const vid = videoRefs.current[a];
-    if (!vid) return;
-    const onEnded = () => advanceClip();
-    vid.addEventListener("ended", onEnded);
-    return () => vid.removeEventListener("ended", onEnded);
-  }, [a, advanceClip]);
-
-  const opacityOf = (i: number) => {
-    if (b !== null) {
-      // crossfading: incoming (b) fades in, outgoing (a) fades out
-      if (i === b) return 1;
-      if (i === a) return 0;
-      return 0;
-    }
-    return i === a ? 1 : 0;
-  };
-
   return (
     <div className="absolute inset-0">
-      {[0, 1].map((i) => (
-        <video
-          key={i}
-          ref={(el) => { videoRefs.current[i] = el; }}
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{
-            opacity: opacityOf(i),
-            transition: `opacity ${CROSSFADE_MS}ms ease-in-out`,
-            zIndex: i === b ? 2 : i === a ? 1 : 0,
-          }}
-          muted
-          playsInline
-          preload="auto"
-          poster={i === 0 ? poster : undefined}
-        />
-      ))}
+      <video
+        className="absolute inset-0 h-full w-full object-cover"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        poster={poster}
+      >
+        <source src="/videos/hero_combined.mp4" type="video/mp4" />
+      </video>
       <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/45 to-black/90" style={{ zIndex: 3 }} />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_30%,_rgba(0,0,0,0.65)_100%)]" style={{ zIndex: 3 }} />
     </div>
@@ -244,9 +183,13 @@ const whyUs = [
 const gallery = [
   { src: g1, h: "tall" },
   { src: g2, h: "short" },
+  { src: diningBreakfast, h: "tall" },
+  { src: diningHall, h: "short" },
   { src: g5, h: "tall" },
   { src: g4, h: "short" },
+  { src: diningRooftop, h: "tall" },
   { src: g3, h: "tall" },
+  { src: diningDish, h: "short" },
   { src: g6, h: "short" },
 ];
 
@@ -268,6 +211,73 @@ const testimonials = [
   },
 ];
 
+function LuxuryCarousel3D({ items }: { items: any[] }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const next = () => setActiveIndex((curr) => (curr + 1) % items.length);
+  const prev = () => setActiveIndex((curr) => (curr - 1 + items.length) % items.length);
+
+  useEffect(() => {
+    const t = setInterval(next, 4000);
+    return () => clearInterval(t);
+  }, [items.length]);
+
+  return (
+    <div 
+      className="relative w-full max-w-6xl mx-auto h-[450px] md:h-[650px] flex items-center justify-center overflow-hidden"
+      style={{ perspective: "1200px" }}
+    >
+      {items.map((item, index) => {
+        let diff = index - activeIndex;
+        if (diff > items.length / 2) diff -= items.length;
+        if (diff < -items.length / 2) diff += items.length;
+
+        const isActive = diff === 0;
+        
+        let zIndex = 10 - Math.abs(diff);
+        let scale = isActive ? 1 : 0.8;
+        let translateX = diff * 45; // percentage offset
+        let opacity = Math.abs(diff) <= 2 ? 1 - Math.abs(diff) * 0.3 : 0;
+        let rotateY = diff * -25; // angle towards center
+        let blur = isActive ? "0px" : "6px";
+
+        if (Math.abs(diff) > 2) return null;
+
+        return (
+          <div
+            key={index}
+            className="absolute transition-all duration-700 ease-out cursor-pointer hover-zoom"
+            style={{
+              transform: `translateX(${translateX}%) scale(${scale}) rotateY(${rotateY}deg)`,
+              zIndex,
+              opacity,
+              filter: `blur(${blur})`,
+            }}
+            onClick={() => setActiveIndex(index)}
+          >
+            <div className="relative w-[280px] md:w-[450px] lg:w-[500px] h-[380px] md:h-[550px] rounded-2xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.6)] border border-white/10 group">
+              <img
+                src={item.src}
+                alt="Luxury Resort Moment"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent transition-opacity duration-500 ${isActive ? "opacity-60" : "opacity-90 group-hover:opacity-75"}`} />
+            </div>
+          </div>
+        );
+      })}
+
+      <button onClick={prev} className="absolute left-2 md:left-8 z-50 p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-white hover:bg-gold hover:text-black hover:scale-110 transition-all duration-300 shadow-xl">
+        <ChevronLeft size={24} />
+      </button>
+      <button onClick={next} className="absolute right-2 md:right-8 z-50 p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-white hover:bg-gold hover:text-black hover:scale-110 transition-all duration-300 shadow-xl">
+        <ChevronRight size={24} />
+      </button>
+    </div>
+  );
+}
+
 function Index() {
   return (
     <main className="bg-background text-foreground">
@@ -286,8 +296,8 @@ function Index() {
           </Reveal>
           <Reveal delay={150}>
             <h1 className="mt-8 font-display text-[2.6rem] sm:text-6xl md:text-7xl lg:text-[5.2rem] text-white leading-[1.04] text-balance">
-              Experience the Soul of Varanasi <br className="hidden sm:block" />
-              in <em className="not-italic text-gradient-gold">Luxury</em>
+              Discover Luxury <br className="hidden sm:block" />
+              Beside the <em className="not-italic text-gradient-gold">Sacred Ganga</em>
             </h1>
           </Reveal>
           <Reveal delay={300}>
@@ -508,6 +518,105 @@ function Index() {
         </div>
       </section>
 
+      {/* EVENTS & CELEBRATIONS */}
+      <section id="events" className="py-24 md:py-36 bg-charcoal text-white overflow-hidden relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-gold/5 via-transparent to-transparent pointer-events-none" />
+        
+        <div className="mx-auto max-w-7xl px-6 lg:px-12 relative z-10">
+          <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 items-center">
+            
+            <div className="flex-1 w-full order-2 lg:order-1 relative">
+              <div className="grid grid-cols-2 gap-4 md:gap-6">
+                <Reveal delay={100} className="col-span-2">
+                  <div className="relative overflow-hidden group hover-zoom rounded-md shadow-2xl">
+                    <img
+                      src={eventWedding}
+                      alt="Grand Weddings"
+                      loading="lazy"
+                      className="w-full aspect-video object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-6 left-6 text-white">
+                      <span className="text-[0.62rem] tracking-[0.3em] uppercase text-gold">Premium</span>
+                      <h3 className="mt-1 font-display text-3xl">Grand Weddings</h3>
+                    </div>
+                  </div>
+                </Reveal>
+                <Reveal delay={200}>
+                  <div className="relative overflow-hidden group hover-zoom rounded-md shadow-2xl">
+                    <img
+                      src={eventConference}
+                      alt="Conferences"
+                      loading="lazy"
+                      className="w-full aspect-[4/5] object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-5 left-5 text-white">
+                      <span className="text-[0.62rem] tracking-[0.3em] uppercase text-gold">Corporate</span>
+                      <h3 className="mt-1 font-display text-xl">Conferences</h3>
+                    </div>
+                  </div>
+                </Reveal>
+                <Reveal delay={300}>
+                  <div className="relative overflow-hidden group hover-zoom rounded-md shadow-2xl">
+                    <img
+                      src={eventRooftop}
+                      alt="Private Dining"
+                      loading="lazy"
+                      className="w-full aspect-[4/5] object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-5 left-5 text-white">
+                      <span className="text-[0.62rem] tracking-[0.3em] uppercase text-gold">Exclusive</span>
+                      <h3 className="mt-1 font-display text-xl">Private Dining</h3>
+                    </div>
+                  </div>
+                </Reveal>
+              </div>
+            </div>
+
+            <div className="flex-1 max-w-xl order-1 lg:order-2">
+              <Reveal><span className="eyebrow text-gold/90">Events & Celebrations</span></Reveal>
+              <Reveal delay={100}>
+                <h2 className="mt-6 font-display text-4xl md:text-5xl lg:text-6xl text-white text-balance leading-[1.1]">
+                  Celebrate Every Moment <br />
+                  in <em className="not-italic text-gradient-gold">Luxury</em>
+                </h2>
+              </Reveal>
+              <Reveal delay={200}><div className="divider-gold my-8" /></Reveal>
+              <Reveal delay={300}>
+                <p className="text-white/75 text-lg leading-relaxed text-balance">
+                  From grand riverside weddings to exclusive corporate retreats, Shiv Rudraksh provides 
+                  the perfect cinematic backdrop. Our meticulously designed banquet halls, rooftop dining 
+                  spaces, and world-class hospitality ensure every event is an unforgettable memory.
+                </p>
+              </Reveal>
+              
+              <div className="mt-10 grid sm:grid-cols-2 gap-4">
+                {[
+                  "Dedicated Event Planners", 
+                  "Bespoke Catering Menus", 
+                  "Luxury Ambiance", 
+                  "State-of-the-Art Facilities"
+                ].map((item, i) => (
+                  <Reveal key={item} delay={400 + (i * 50)}>
+                    <div className="flex items-center gap-4 bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-sm hover:border-gold/40 hover:bg-white/10 transition-all duration-500">
+                      <Sparkles size={18} className="text-gold shrink-0" />
+                      <span className="font-display text-white/90 tracking-wide text-sm">{item}</span>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+
+              <Reveal delay={600}>
+                <a href="#contact" className="luxe-btn mt-10 shadow-[0_0_20px_rgba(212,175,55,0.15)] hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]">Plan Your Event</a>
+              </Reveal>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
       {/* EXPERIENCES */}
       <section id="experiences" className="py-24 md:py-36 bg-charcoal text-white">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
@@ -578,23 +687,9 @@ function Index() {
             <Reveal delay={200}><div className="divider-gold mx-auto my-8" /></Reveal>
           </div>
 
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 [column-fill:_balance]">
-            {gallery.map((g, i) => (
-              <Reveal key={i} delay={(i % 3) * 100} className="mb-6 break-inside-avoid">
-                <div className="relative overflow-hidden hover-zoom group">
-                  <img
-                    src={g.src}
-                    alt="Luxury riverside resort interior in Varanasi"
-                    loading="lazy"
-                    className={`w-full object-cover ${
-                      g.h === "tall" ? "aspect-[3/4]" : "aspect-[4/3]"
-                    }`}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-500" />
-                </div>
-              </Reveal>
-            ))}
-          </div>
+          <Reveal delay={300}>
+            <LuxuryCarousel3D items={gallery} />
+          </Reveal>
 
           <div className="text-center mt-16">
             <Reveal>
