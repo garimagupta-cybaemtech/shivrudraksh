@@ -9,5 +9,6 @@ export default async (request, context) => {
 };
 
 export const config = {
-  path: "/*"
+  path: "/*",
+  excludedPaths: ["/assets/*", "/videos/*", "/favicon.png"]
 };
