@@ -86,7 +86,7 @@ function CinematicHeroVideo({ poster }: { poster: string }) {
       <video
         ref={videoRef}
         className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
-          isPlaying ? "opacity-45" : "opacity-0"
+          isPlaying ? "opacity-100" : "opacity-0"
         }`}
         autoPlay
         muted
@@ -98,11 +98,8 @@ function CinematicHeroVideo({ poster }: { poster: string }) {
       >
         <source src="/videos/hero_combined.mp4" type="video/mp4" />
       </video>
-      {/* Cinematic Depth-of-Field Soft Blur */}
-      <div className="absolute inset-0 backdrop-blur-[1.5px]" style={{ zIndex: 1 }} />
-      {/* Luxury Cinematic Gradient Overlays */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/60 to-black/95" style={{ zIndex: 3 }} />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_20%,_rgba(0,0,0,0.85)_100%)]" style={{ zIndex: 3 }} />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/45 to-black/90" style={{ zIndex: 3 }} />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_30%,_rgba(0,0,0,0.65)_100%)]" style={{ zIndex: 3 }} />
     </div>
   );
 }
@@ -344,39 +341,33 @@ function Index() {
       >
         <CinematicHeroVideo poster={heroImg} />
 
-        <div className="relative z-10 px-6 text-center max-w-5xl mx-auto w-full">
-          {/* Glassmorphic luxury container behind text for ultimate readability */}
-          <div className="relative z-10 bg-black/35 backdrop-blur-[12px] px-8 sm:px-12 md:px-20 py-12 md:py-20 rounded-[32px] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] overflow-hidden">
-            {/* Soft inner glow gradient */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.02)_0%,_transparent_70%)] pointer-events-none" />
-            
-            <Reveal>
-              <span className="eyebrow text-gold/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">Luxury · Riverside · Varanasi</span>
-            </Reveal>
-            <Reveal delay={150}>
-              <h1 className="mt-8 font-display text-[2.4rem] sm:text-6xl md:text-7xl lg:text-[5.2rem] text-white leading-[1.04] text-balance drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
-                Discover Luxury <br className="hidden sm:block" />
-                Beside the <em className="not-italic text-gradient-gold">Sacred Ganga</em>
-              </h1>
-            </Reveal>
-            <Reveal delay={300}>
-              <p className="mt-7 font-display italic text-xl md:text-2xl text-white/95 text-balance drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
-                Where spiritual serenity meets modern comfort.
-              </p>
-            </Reveal>
-            <Reveal delay={450}>
-              <p className="mt-6 max-w-xl mx-auto text-white/80 leading-relaxed text-balance drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)]">
-                A boutique riverside resort by the sacred Ganga — premium suites, soulful evenings
-                and timeless hospitality in the eternal city.
-              </p>
-            </Reveal>
-            <Reveal delay={600}>
-              <div className="mt-12 flex flex-col sm:flex-row gap-4 items-center justify-center">
-                <a href="#contact" onClick={(e) => handleScroll(e, "#contact")} className="luxe-btn shadow-[0_4px_20px_rgba(0,0,0,0.4)]">Reserve Your Stay</a>
-                <a href="#rooms" onClick={(e) => handleScroll(e, "#rooms")} className="luxe-btn-ghost backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.4)]">Explore Suites</a>
-              </div>
-            </Reveal>
-          </div>
+        <div className="relative z-10 px-6 text-center max-w-5xl mx-auto">
+          <Reveal>
+            <span className="eyebrow text-gold/90">Luxury · Riverside · Varanasi</span>
+          </Reveal>
+          <Reveal delay={150}>
+            <h1 className="mt-8 font-display text-[2.6rem] sm:text-6xl md:text-7xl lg:text-[5.2rem] text-white leading-[1.04] text-balance">
+              Discover Luxury <br className="hidden sm:block" />
+              Beside the <em className="not-italic text-gradient-gold">Sacred Ganga</em>
+            </h1>
+          </Reveal>
+          <Reveal delay={300}>
+            <p className="mt-7 font-display italic text-xl md:text-2xl text-white/85 text-balance">
+              Where spiritual serenity meets modern comfort.
+            </p>
+          </Reveal>
+          <Reveal delay={450}>
+            <p className="mt-6 max-w-xl mx-auto text-white/70 leading-relaxed text-balance">
+              A boutique riverside resort by the sacred Ganga — premium suites, soulful evenings
+              and timeless hospitality in the eternal city.
+            </p>
+          </Reveal>
+          <Reveal delay={600}>
+            <div className="mt-12 flex flex-col sm:flex-row gap-4 items-center justify-center">
+              <a href="#contact" onClick={(e) => handleScroll(e, "#contact")} className="luxe-btn">Reserve Your Stay</a>
+              <a href="#rooms" onClick={(e) => handleScroll(e, "#rooms")} className="luxe-btn-ghost">Explore Suites</a>
+            </div>
+          </Reveal>
         </div>
 
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/60 float-slow z-10">
