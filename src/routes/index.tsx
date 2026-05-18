@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useRef, useState, useEffect, useCallback } from "react";
 import {
   BedDouble,
   Waves,
@@ -42,9 +43,95 @@ import g5 from "@/assets/gallery-5.jpg";
 import g6 from "@/assets/gallery-6.jpg";
 import ctaNight from "@/assets/cta-night.jpg";
 
-// Cinematic free drone-style ambient footage (Pexels CDN, no auth required)
-const HERO_VIDEO =
-  "https://videos.pexels.com/video-files/2169880/2169880-uhd_3840_2160_30fps.mp4";
+const HERO_CLIPS = [
+  "/videos/hero_ganga_aerial.mp4",
+  "/videos/hero_lobby_entrance.mp4",
+  "/videos/hero_luxury_suite.mp4",
+  "/videos/hero_aerial_pullback.mp4",
+];
+
+const CROSSFADE_MS = 1200;
+
+function CinematicHeroVideo({ poster }: { poster: string }) {
+  // a = current visible buffer index (0 or 1)
+  // b = incoming buffer index during crossfade (null when not fading)
+  const [a, setA] = useState(0);
+  const [b, setB] = useState<number | null>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([null, null]);
+  const clipIdxRef = useRef(0);
+  const activeRef = useRef(0);
+  const fadingRef = useRef(false);
+
+  const advanceClip = useCallback(() => {
+    if (fadingRef.current) return;
+    fadingRef.current = true;
+    const nextClip = (clipIdxRef.current + 1) % HERO_CLIPS.length;
+    const nextBuf = (activeRef.current + 1) % 2;
+    const nextVid = videoRefs.current[nextBuf];
+    if (!nextVid) return;
+    nextVid.src = HERO_CLIPS[nextClip];
+    nextVid.load();
+    nextVid.play().catch(() => {});
+    // show the incoming buffer (it fades in via CSS transition)
+    setB(nextBuf);
+    setTimeout(() => {
+      clipIdxRef.current = nextClip;
+      activeRef.current = nextBuf;
+      fadingRef.current = false;
+      setA(nextBuf);
+      setB(null);
+    }, CROSSFADE_MS);
+  }, []);
+
+  useEffect(() => {
+    const vid = videoRefs.current[0];
+    if (!vid) return;
+    vid.src = HERO_CLIPS[0];
+    vid.load();
+    vid.play().catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const vid = videoRefs.current[a];
+    if (!vid) return;
+    const onEnded = () => advanceClip();
+    vid.addEventListener("ended", onEnded);
+    return () => vid.removeEventListener("ended", onEnded);
+  }, [a, advanceClip]);
+
+  const opacityOf = (i: number) => {
+    if (b !== null) {
+      // crossfading: incoming (b) fades in, outgoing (a) fades out
+      if (i === b) return 1;
+      if (i === a) return 0;
+      return 0;
+    }
+    return i === a ? 1 : 0;
+  };
+
+  return (
+    <div className="absolute inset-0">
+      {[0, 1].map((i) => (
+        <video
+          key={i}
+          ref={(el) => { videoRefs.current[i] = el; }}
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{
+            opacity: opacityOf(i),
+            transition: `opacity ${CROSSFADE_MS}ms ease-in-out`,
+            zIndex: i === b ? 2 : i === a ? 1 : 0,
+          }}
+          muted
+          playsInline
+          preload="auto"
+          poster={i === 0 ? poster : undefined}
+        />
+      ))}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/45 to-black/90" style={{ zIndex: 3 }} />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_30%,_rgba(0,0,0,0.65)_100%)]" style={{ zIndex: 3 }} />
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -191,21 +278,7 @@ function Index() {
         id="home"
         className="relative h-screen w-full overflow-hidden flex items-center justify-center"
       >
-        <div className="absolute inset-0">
-          <video
-            className="h-full w-full object-cover kenburns"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster={heroImg}
-          >
-            <source src={HERO_VIDEO} type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/55 to-black/95" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_30%,_rgba(0,0,0,0.7)_100%)]" />
-        </div>
+        <CinematicHeroVideo poster={heroImg} />
 
         <div className="relative z-10 px-6 text-center max-w-5xl mx-auto">
           <Reveal>
