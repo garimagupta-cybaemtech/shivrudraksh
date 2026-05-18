@@ -7,8 +7,3 @@ export default async (request, context) => {
     return new Response("SSR Error: " + e.message, { status: 500 });
   }
 };
-
-export const config = {
-  path: "/*",
-  excludedPaths: ["/assets/*", "/videos/*", "/favicon.png"]
-};
