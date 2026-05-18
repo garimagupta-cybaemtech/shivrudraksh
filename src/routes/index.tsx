@@ -53,16 +53,48 @@ import diningRooftop from "@/assets/dining/rooftop.png";
 import diningDish from "@/assets/dining/dish.png";
 
 function CinematicHeroVideo({ poster }: { poster: string }) {
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      // Force play programmatically to override strict browser autoplay blocks
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch((err) => {
+            console.log("Autoplay was prevented, retrying on user interaction...", err);
+            // Fallback: try playing again on any user interaction
+            const handleGesture = () => {
+              video.play().then(() => {
+                setIsPlaying(true);
+                document.removeEventListener("click", handleGesture);
+              });
+            };
+            document.addEventListener("click", handleGesture);
+          });
+      }
+    }
+  }, []);
+
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0 bg-black">
       <video
-        className="absolute inset-0 h-full w-full object-cover"
+        ref={videoRef}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2000ms] ease-in-out ${
+          isPlaying ? "opacity-100" : "opacity-0"
+        }`}
         autoPlay
         muted
         loop
         playsInline
         preload="auto"
         poster={poster}
+        onPlay={() => setIsPlaying(true)}
       >
         <source src="/videos/hero_combined.mp4" type="video/mp4" />
       </video>
